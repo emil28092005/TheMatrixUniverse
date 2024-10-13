@@ -1,45 +1,41 @@
-import numpy as np
+from tools import *
 
-class Entity:
-    position = np.array([0,0])
+class entity:
+    position = Vector2(0,0)
     name = ""
-    def __init__(self, InitialPosition, name):
-        self.position = InitialPosition
+    def __init__(self, initial_position, name):
+        self.position = initial_position
         self.name = name
-    
-    
-class Actor(Entity):
-    perceptionRadius = 0
-    percievedCells = None 
-    def __init__(self, InitialPosition, name, perceptionRadius):
-        super().__init__(InitialPosition, name)
-        self.perceptionRadius = perceptionRadius
-    
-    
-class Neo(Actor):
-    keyMakerPosition = np.array([0,0])
-    def __init__(self, InitialPosition, perceptionRadius, keyMakerPosition):
-        super().__init__(InitialPosition, "Neo", perceptionRadius)
-        self.keyMakerPosition = keyMakerPosition
 
-class Smith(Actor):
-    def __init__(self, InitialPosition, perceptionRadius):
-        super().__init__(InitialPosition, "Smith", perceptionRadius)
-    def Kill():
-        print("Neo is killed.") #TODO: delete    
+class actor(entity):
+    perception_radius = 0
+    perceived_cells = None 
+    def __init__(self, initial_position, name, perception_radius):
+        super().__init__(initial_position, name)
+        self.perception_radius = perception_radius
 
-class Sentinel(Actor):
-    def __init__(self, InitialPosition, perceptionRadius):
-        super().__init__(InitialPosition, "Sentinel", perceptionRadius)
-    def Kill():
+class neo(actor):
+    key_maker_position = Vector2(0,0)
+    def __init__(self, initial_position, perception_radius, key_maker_position):
+        super().__init__(initial_position, "neo", perception_radius)
+        self.key_maker_position = key_maker_position
+
+class smith(actor):
+    def __init__(self, initial_position, perception_radius):
+        super().__init__(initial_position, "smith", perception_radius)
+    def kill():
         print("Neo is killed.") #TODO: delete
 
-class Keymaker(Entity):
-    def __init__(self, InitialPosition):
-        super().__init__(InitialPosition, "Keymaker")
+class sentinel(actor):
+    def __init__(self, initial_position, perception_radius):
+        super().__init__(initial_position, "sentinel", perception_radius)
+    def kill():
+        print("Neo is killed.") #TODO: delete
 
-class BackdoorKey(Entity):
-    def __init__(self, InitialPosition):
-        super().__init__(InitialPosition, "BackdoorKey")
+class key_maker(entity):
+    def __init__(self, initial_position):
+        super().__init__(initial_position, "key_maker")
 
-
+class backdoor_key(entity):
+    def __init__(self, initial_position):
+        super().__init__(initial_position, "backdoor_key")
