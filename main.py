@@ -1,4 +1,144 @@
+import pygame as pg
 
+class Cell:
+    coordinates = (0, 0)
+    position = (0, 0)
+    size = 50
+    perceptor = None
+    content = None
+    rect = pg.Rect(0, 0, size, size)
+    border_width = 2
+    def __init__(self, position):
+        self.set_position(position)
+        self.rect = pg.Rect(self.coordinates[0], self.coordinates[1],
+                            self.size - self.border_width, self.size - self.border_width)
+    def set_position(self, position):
+        self.position = position
+        self.coordinates = (self.position[0] * self.size,
+                            self.position[1] * self.size)
+    def set_content(self, content):
+        self.content = content
+        self.content
+    def set_perceptor(self, perceptor):
+        self.perceptor = perceptor
+    def draw(self):
+        if self.perceptor == None:
+            pg.draw.rect(screen, "white", self.rect)
+        else:
+            pg.draw.rect(screen, self.perceptor.color, self.rect)
+            print(self.perceptor.color)
+    pass
+
+class Map:
+    cell_matrix = []
+    dimensions = (8, 8)
+    def __init__(self, dimensions:tuple):
+        self.dimensions = dimensions
+        for x in range(dimensions[0] - 1):
+            column = []
+            for y in range(dimensions[1] - 1):
+                column.append(Cell((x,y)))
+            self.cell_matrix.append(column)
+    def get_cell(self, x, y):
+        return self.cell_matrix[x][y]
+    def draw(self):
+        for x in range(self.dimensions[0] - 1):
+            for y in range(self.dimensions[1] - 1):
+                self.get_cell(x, y).draw()
+        
+
+
+class Entity:
+    coordinates = (0, 0)
+    position = (0, 0)
+    offset = (0, 0)
+    cell = None
+    name = ""
+    color = "black"
+    def __init__(self, cell_position):
+        self.set_cell(map.get_cell(cell_position[0], cell_position[1]))
+    def set_cell(self, cell):
+        self.cell = cell
+        self.position = cell.position
+        self.coordinates = (self.cell.coordinates[0] + self.offset[0],
+                            self.cell.coordinates[1] + self.offset[1])
+        self.cell.set_content(self)
+    def draw(self):
+        font = pg.font.Font(None, 32)
+        text = font.render(self.name, True, self.color)
+        screen.blit(text, ((self.cell.coordinates[0] + self.offset[0], self.cell.coordinates[1] + self.offset[1])))
+    
+        
+    
+    pass
+class Actor(Entity):
+    perception_radius = 1
+    percepted_cells = []
+    def percept(self, cell):
+        cell.set_perceptor(self)
+    pass
+
+class Neo(Actor):
+    def __init__(self, cell_position):
+        super().__init__(cell_position)
+        self.color = "blue"
+        self.name = "neo"
+    def percept(self):
+        for x in range(self.position[0] - self.perception_radius,
+                       self.position[0] + self.perception_radius + 1):
+            for y in range(self.position[1] - self.perception_radius,
+                           self.position[1] + self.perception_radius + 1):
+                if (x != self.position[0] or y != self.position[1]):
+                    print(x, y)
+                    map.get_cell(x, y).set_perceptor(self)
+                
+    pass
+class Smith(Actor):
+    pass
+class Sentinel(Actor):
+    pass
+class Key_maker(Entity):
+    pass
+class Backdoor_key(Entity):
+    pass
+
+
+
+
+
+
+map = Map((8, 8))
+neo = Neo((3, 3))
+
+pg.init()
+screen = pg.display.set_mode([512,512])
+pg.display.set_caption("Matrix Universe")
+running = True
+while running:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
+    screen.fill("black")
+    map.draw()
+    neo.draw()
+    neo.percept()
+    pg.display.update()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 import pygame as pg
 
 
@@ -220,3 +360,4 @@ while running:
     pg.time.delay(5000)
 
 
+'''
