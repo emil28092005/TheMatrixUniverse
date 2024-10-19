@@ -37,24 +37,25 @@ class Vector2:
 
 
 
-
-
 #ENTITIES
 class Entity:
     coordinates = Vector2(0,0) ##PIXELS
     position = Vector2(0,0) ##CELLS
     name = ""
+    cell = None
     def __init__(self, initial_position:tuple, name):
         self.position.set_from_tuple(initial_position)
-        #self.set_cell(initial_position[0], initial_position[1])
-        self.coordinates = map.cell_grid[initial_position[0]][initial_position[1]].coordinates
-        map.cell_grid[initial_position[0]][initial_position[1]].set_content(self)
         self.name = name
+        self.set_cell(initial_position[0], initial_position[1])
+
     def set_cell(self, x, y):
         map.get_cell(self.position.x,self.position.y).set_content(None)
         self.position.set_from_tuple((x,y))
         self.coordinates = map.cell_grid[x][y].coordinates
-        map.cell_grid[x][y].set_content(self)
+        map.get_cell(x,y).set_content(self)
+        cell = map.get_cell(self.position.x,self.position.y)
+    def get_cell(self):
+        return self.cell
     def draw(self, color):
         font = pg.font.Font(None, 32)
         text = font.render(self.name, True, color)
@@ -70,8 +71,30 @@ class Actor(Entity):
 class Neo(Actor):
     key_maker_position = Vector2(0,0)
     def __init__(self, initial_position, perception_radius, key_maker_position):
-        super().__init__(initial_position, "neo", perception_radius)
+        super().__init__(initial_position, "neo", 1)
         self.key_maker_position = key_maker_position
+    def percept(self):
+        upper_left_corner_cell = map.get_cell(self.position.x - self.perception_radius, self.position.y - self.perception_radius)
+        for y in range(upper_left_corner_cell.position.y, upper_left_corner_cell.position.y + self.perception_radius * 2 + 1):
+            for x in range(upper_left_corner_cell.position.x, upper_left_corner_cell.position.x + self.perception_radius * 2 + 1):
+                #print(x,y)
+                
+                if x < map.dimension.x and y < map.dimension.y:
+                    
+                    cell = map.get_cell(x, y) #TODO:PROPER COLORIZE
+                    print(x,y)
+                    cell.add_perceptor(self)
+                    #print(map.get_cell(x,y).perceptors[0].name)
+                    #print(cell.position.to_array())
+                    #print(cell.perceptors[0].name)
+        for x in range(8):
+            for y in range(8):
+                print(x,y)
+                print(map.get_cell(x,y).perceptors[0])
+        
+                    
+                
+                
         
 
 class Smith(Actor):
@@ -106,13 +129,39 @@ class Cell:
     size = 50
     piece = pg.Rect(0, 0, size, size)
     content = None
+    perceptors = [None]
+    color = (255, 255, 255)
     def __init__(self, coordinates):
         self.coordinates = coordinates
         self.piece = pg.Rect(self.coordinates.x, self.coordinates.y, self.size, self.size)
     def draw(self):
-        pg.draw.rect(screen, (255, 255, 255), self.piece)
+        if self.has_perceptor("neo"):
+            #cell.set_color((0,255,0)) #TODO:COLORIZE
+            print(self.position.to_array())
+            pg.draw.rect(screen, "green", self.piece)
+        else:
+            #print(5555555555555555)
+            pg.draw.rect(screen, "white", self.piece)
+    def set_color(self, color):
+        self.color = color
     def set_content(self, content):
         self.content = content
+    def add_perceptor(self, new_perceptor):
+        self.perceptors.append(new_perceptor)
+    def delete_perceptor(self, redundant_perceptor):
+        if self.has_perceptor(redundant_perceptor.name):
+            self.perceptors.remove(redundant_perceptor)    
+        else:
+            pass #print(123)
+    def has_perceptor(self, name):
+        for i in self.perceptors:
+            if (i != None and i.name == name):
+                #print(987654321)
+                #print(i)
+                #print(self.position.to_array())
+                return True
+        #print(123456)
+        return False
     
         
 class Map:
@@ -150,17 +199,24 @@ neo = Neo((0,0), 1, (0,0))
 neo.set_cell(4,5)
 
 #smith = Smith((0,0),2)
-print(map.get_cell(4,5).content.name)
-print(map.get_cell(0,0).content)
+#print(map.get_cell(4,5).content.name)
+#print(map.get_cell(0,0).content)
 
 running = True
 
-while (running): 
+
+while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
     screen.fill('BLACK')
     map.draw()
     neo.draw("blue")
-    #smith.draw("red")
+    neo.percept()
+    neo.set_cell(1,1)
+    #print(map.get_cell(7,7).perceptors[0].name)
+    
     pg.display.update()
+    pg.time.delay(5000)
+
+
