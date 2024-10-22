@@ -8,6 +8,7 @@ class Cell:
     content = None
     rect = pg.Rect(0, 0, size, size)
     border_width = 2
+    closed = False
     g = 1
     h = 2
     f = g + h
@@ -111,16 +112,38 @@ class Actor(Entity):
     pass
 
 class Neo(Actor):
+    open_set = []
     def __init__(self, cell_position):
         super().__init__(cell_position)
-        self.color = "blue"
+        self.color = (100, 100, 255)
         self.name = "neo"
+    def set_position(self, x, y):
+        map.get_cell(x, y).closed = True
+        self.update_open_set()
+        return super().set_position(x, y)
+    def update_open_set(self):
+        
+        self.open_set = []
+
+        estimated_cells = []
+        estimated_cells.append((self.position[0] + 1, self.position[1]))
+        estimated_cells.append((self.position[0] - 1, self.position[1]))
+        estimated_cells.append((self.position[0], self.position[1] + 1))
+        estimated_cells.append((self.position[0], self.position[1] - 1))
+        for i in estimated_cells:
+            if 0 <= i[0] < map.dimensions[0] and 0 <= i[1] < map.dimensions[1]:
+                if (map.get_cell(i[0], i[0]).closed == False):
+                    self.open_set.append(map.get_cell(i[0], i[1]))
+        
+
     def percept(self):
         #clear percepted celles
         for i in self.percepted_cells:
             if (i != None):
                 i.clear_perceptor()
         self.percepted_cells = []
+        
+        self.open_set = []
             
         for x in range(self.position[0] - self.perception_radius,
                        self.position[0] + self.perception_radius + 1):
@@ -129,6 +152,7 @@ class Neo(Actor):
                 if 0 <= x < map.dimensions[0] and 0 <= y < map.dimensions[1]:
                     if (x != self.position[0] or y != self.position[1]):
                         self.percepted_cells.append(map.get_cell(x, y)) #set current percieved cells
+                        
             
         #set perceptors        
         for i in self.percepted_cells:
@@ -210,8 +234,12 @@ def read_input():
     return inpt
     
 def move(x, y):
-    neo.set_position(x, y)
-    print(f"m {x} {y}")
+    neo.update_open_set()
+    if map.get_cell(x, y) in neo.open_set: #TODO: FIX CHECK
+        neo.set_position(x, y)
+        print(f"m {x} {y}")
+    else:
+        print("ERROR: CAN'T MOVE HERE")
 
 
 map = Map((8, 8))
@@ -225,6 +253,7 @@ screen = pg.display.set_mode([1124,1124])
 pg.display.set_caption("Matrix Universe")
 running = True
 #pg.time.delay(7000)
+neo.set_position(0, 0) #TODO: ITS TEMPORARY
 move(0, 0)
 read_initial_inputs()
 pg.time.delay(1500)
