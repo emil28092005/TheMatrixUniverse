@@ -234,12 +234,14 @@ def read_input():
     return inpt
     
 def move(x, y):
-    neo.update_open_set()
+    for i in neo.open_set:
+        print(i.position)
     if map.get_cell(x, y) in neo.open_set: #TODO: FIX CHECK
         neo.set_position(x, y)
         print(f"m {x} {y}")
     else:
         print("ERROR: CAN'T MOVE HERE")
+    neo.update_open_set()
 
 
 map = Map((8, 8))
@@ -254,6 +256,7 @@ pg.display.set_caption("Matrix Universe")
 running = True
 #pg.time.delay(7000)
 neo.set_position(0, 0) #TODO: ITS TEMPORARY
+neo.update_open_set()
 move(0, 0)
 read_initial_inputs()
 pg.time.delay(1500)
