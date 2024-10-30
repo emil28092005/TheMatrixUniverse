@@ -119,7 +119,7 @@ def read_system():
             input_formatted.append((input_str_split[2]))
             
             
-            items[(input_formatted[0], input_formatted[1])] = input_formatted[2]
+            items[(input_formatted[0], input_formatted[1])] = input_formatted[2] #SWAP 0 and 1 ?
         
     return items
     
@@ -187,7 +187,7 @@ while (finish == False):
         # Если таких ячеек несколько, выбираем ту, у которой минимальный h
         next_cell = min(min_f_cell_list, key=lambda cell: get_h(cell))
 
-    #time.sleep(7) #TODO TEMP
+    #time.sleep(3) #TODO TEMP
     neo = get_verified_move_position(next_cell)
     closed_cells.append(next_cell)
     print(f"m {next_cell[0]} {next_cell[1]}")
@@ -220,5 +220,6 @@ while (finish == False):
     print(walkable_cells_and_f)
     print("next_cell:")
     print(next_cell)'''
+    #print_map_f()
 #print("FINISH!")
 print(f"e {steps_count}")
