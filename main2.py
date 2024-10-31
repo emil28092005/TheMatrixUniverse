@@ -125,7 +125,7 @@ while not finish:
         next_cell = min(min_f_cell_list, key=lambda cell: get_h(cell))
     neo = next_cell
     accumulated_g += 1 # TODO ENSURE THAT g WORKS PROPERLY
-    closed_cells.append(next_cell)
+    closed_cells.append(next_cell) # TODO DELETE
     passed_cells.append(next_cell)
     print(f"m {next_cell[1]} {next_cell[0]}") # TODO FIX OR ENSURE THAT x,y OR y,x DOES NOT MAKE ANY DIFFERENCE
     steps_count += 1
