@@ -2,7 +2,7 @@ import sys
 import heapq
 
 # Initialize cost, heuristic, map, visited nodes, and parent tracking arrays
-min_costs = [[100]*9 for _ in range(9)]  # Initialize minimum cost array with a high value (100)
+min_costs = [[10000]*9 for _ in range(9)]  # Initialize minimum cost array with a high value (10000)
 hs = [[0]*9 for _ in range(9)]  # Heuristic array for A* (Manhattan distance)
 astar_map = [['.']*9 for _ in range(9)]  # Initial unexplored map with '.'
 visited_nodes = [[False]*9 for _ in range(9)]  # Track visited nodes
@@ -17,7 +17,7 @@ goal_x, goal_y = int(input_list[0]), int(input_list[1])  # Keymaker’s coordina
 for i in range(9):
     for j in range(9):
         hs[j][i] = abs(j - goal_y) + abs(i - goal_x)  # Calculate heuristic distance
-        min_costs[j][i] = 100  # Set initial high cost for all cells
+        min_costs[j][i] = 10000  # Set initial high cost for all cells
 
 min_costs[0][0] = 0  # Starting position (0,0) cost is zero
 
@@ -77,7 +77,7 @@ while len(priority_queue) != 0:
             astar_map[neighbor_y][neighbor_x] = neighbor_char  # Update map
 
 # Check if the goal is reached and output the result
-if min_costs[goal_y][goal_x] != 100:
+if min_costs[goal_y][goal_x] != 10000:
     print(f"e {min_costs[goal_y][goal_x]}")  # Output shortest path length
 else:
-    print("e -1")  # Output -1 if unsolvable
+    print("e -1")  # Output -1 if unsolvable.
