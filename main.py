@@ -1,4 +1,4 @@
-import time
+#import time
 MAP_SIZE = 9
 start = (0, 0)
 neo = start
@@ -179,14 +179,17 @@ def calculate_minimal_cell(cells:list, filter=None):
         
 def roll_back(looking_for_cell:tuple):
     global neo
-    time.sleep(0.1)
+    #time.sleep(0.1)
     while(get_previous(neo) != None and looking_for_cell not in get_walkable_cells_list(neo)):
-        print_cells_parameters(get_walkable_cells_list(neo))
-        print("roll back")
-        print(f"target: ({looking_for_cell[0]},{looking_for_cell[1]})")
-        print_map()
+        #print_cells_parameters(get_walkable_cells_list(neo))
+        #print("roll back")
+        #print(f"target: ({looking_for_cell[0]},{looking_for_cell[1]})")
+        #print_map()
+        inputs = read_system()
         neo = get_previous(neo)
-        time.sleep(0.1)
+        steps_count += 1
+        print(f"m {neo[0]} {neo[1]}")
+        #time.sleep(0.1)
 
 def get_position_input():
     position_input_list = input().split(" ")
@@ -208,7 +211,7 @@ keymaker = (5,6)
 initialize_map_dict()
 calculate_all_h_for_target(keymaker)
 
-make_blocked((1,1))
+'''make_blocked((1,1))
 make_blocked((1,2))
 make_blocked((1,3))
 make_blocked((1,4))
@@ -216,14 +219,23 @@ make_blocked((4,6))
 make_blocked((5,5))
 make_blocked((6,6))
 make_blocked((4,7))
-make_blocked((4,8))
-print_map()
+make_blocked((4,8))'''
+#print_map()
 
-print_cells_parameters(get_walkable_cells_list(neo))
-time.sleep(0.1)
+#print_cells_parameters(get_walkable_cells_list(neo))
+#time.sleep(0.1)
 finish = False
 seeking_for_target = False
+perception_radius = input()
+keymaster = get_position_input()
+print("m 0 0")
 while (finish == False):
+    inputs = read_system()
+    if inputs != False:
+        for inpt in inputs.items():
+            if inpt[1] == "P":
+                make_blocked(inpt[0])
+    
     make_closed(neo)
     for cell in get_walkable_cells_list(neo):
         if get_status(cell) == ".":
@@ -249,11 +261,13 @@ while (finish == False):
         next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
     assign_previous(next_cell, calculate_cell_with_minimal_g(get_walkable_cells_list(next_cell), "-"))
     previous = get_previous(next_cell)
-    print_cells_parameters(get_walkable_cells_list(neo))
-    print_map()
+    #print_cells_parameters(get_walkable_cells_list(neo))
+    #print_map()
     neo = next_cell
-    
-    time.sleep(0.2)
+    steps_count += 1
+    print(f"m {neo[0]} {neo[1]}")
+    #time.sleep(0.2)
     if neo == keymaker:
         finish = True
         # TODO MAKE CHECK IF NO PATH EXISTS
+print(f"e {steps_count}")
