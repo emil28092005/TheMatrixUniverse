@@ -15,7 +15,7 @@ map_dict = dict()
 def initialize_map_dict():
     for x in range(MAP_SIZE):
         for y in range(MAP_SIZE):
-            map_dict[(x,y)] = [0, 0, ".", None] #g h status previous_cell
+            map_dict[(x,y)] = [1000000, 0, ".", None] #g h status previous_cell
 
 def calculate_all_h_for_target(target:tuple):
     for item in map_dict.items():
@@ -161,6 +161,10 @@ def calculate_minimal_cell(cells:list, filter=None):
         if get_h(cell) == min_h: #get_h(cell)
             min_cells_by_h.append(cell)
             
+    for cell in min_cells_by_h:
+        if get_status(cell) == "+":
+            next_cell = cell
+            return next_cell
     next_cell = min_cells_by_h[0]
     return next_cell
 
@@ -183,6 +187,20 @@ def roll_back(looking_for_cell:tuple):
         print_map()
         neo = get_previous(neo)
         time.sleep(0.1)
+
+def get_position_input():
+    position_input_list = input().split(" ")
+    return int(position_input_list[0]), int(position_input_list[1])
+
+def read_system():
+    number_of_items = int(input())
+    if number_of_items == 0:
+        return False
+    items = {}
+    for _ in range(number_of_items):
+        x, y, status = input().split(' ')
+        items[(int(x), int(y))] = status
+    return items
         
 # TODO MAYBE MAKE A FUNCTION THAT RECALCULATES ALL "PREVIOSES" ON THE MAP USING assign_previous(cell, calculate_cell_with_minimal_g(get_walkable_cells_list(cell), "-"))
 keymaker = (5,6)
@@ -212,47 +230,23 @@ while (finish == False):
             make_opened(cell)
             # TODO find and connect to minimum f|h closed in its own walkable radius
         if get_status(cell) == "+":
-            if (get_g(neo) + 1) < get_g(cell) or get_g(cell) == 0:
+            if (get_g(neo) + 1) < get_g(cell) or get_g(cell) == 1000000:
                 set_g(cell, (get_g(neo) + 1)) # TODO MAKE A CHECK IF EXISTING g SMALLER THAN NEW ONE
     
     target_cell = calculate_minimal_cell(list(map_dict.keys()), "+") 
-    
-    if target_cell in get_walkable_cells_list(neo) and not seeking_for_target:
-        next_cell = target_cell
-        print("reachable and not seeking")
-        print(f"target: ({target_cell[0]},{target_cell[1]})")
-        calculate_all_h_for_target(keymaker)
-    elif target_cell not in get_walkable_cells_list(neo) and seeking_for_target:
-        next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
-        print("not reachable and seeking") 
-        print(f"target: ({target_cell[0]},{target_cell[1]})")
-        calculate_all_h_for_target(target_cell)
-    elif target_cell in get_walkable_cells_list(neo) and seeking_for_target:
+   
+    if target_cell in get_walkable_cells_list(neo):
         seeking_for_target = False
-        next_cell = target_cell
-        print("reachable and seeking")
-        print(f"target: ({target_cell[0]},{target_cell[1]})")
-        calculate_all_h_for_target(keymaker)
-        
-    elif target_cell not in get_walkable_cells_list(neo) and not seeking_for_target:
-        seeking_for_target = True
+    if target_cell not in get_walkable_cells_list(neo) and not seeking_for_target:
         roll_back(target_cell)
-        calculate_all_h_for_target(target_cell)
-        print("not reachable and not seeking")
-        print(f"target: ({target_cell[0]},{target_cell[1]})")
-        if target_cell in get_walkable_cells_list(neo) and seeking_for_target:
-            seeking_for_target = False
+        seeking_for_target = True
+        if target_cell in get_walkable_cells_list(neo):
             next_cell = target_cell
-            print("reachable and seeking (found after roll back)")
-            print(f"target: ({target_cell[0]},{target_cell[1]})")
-            calculate_all_h_for_target(keymaker)
-        elif target_cell not in get_walkable_cells_list(neo) and seeking_for_target:
+            seeking_for_target = False
+        else:            
             next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
-            print("not reachable and seeking (not found after roll back)") 
-            print(f"target: ({target_cell[0]},{target_cell[1]})")
-            calculate_all_h_for_target(target_cell)
-    
-    
+    else:
+        next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
     assign_previous(next_cell, calculate_cell_with_minimal_g(get_walkable_cells_list(next_cell), "-"))
     previous = get_previous(next_cell)
     print_cells_parameters(get_walkable_cells_list(neo))
