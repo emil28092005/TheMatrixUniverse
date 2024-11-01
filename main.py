@@ -32,12 +32,14 @@ def print_map():
                 map_str += " n "
             elif (x,y) == keymaker:
                 map_str += " k "  
+            #elif (x,y) == (3,7):
+            #    map_str += " m " 
             else: 
                 map_str += f" {map_dict[(x, y)][2]} "
         map_str += "\n"
     print(map_str)
 
-def print_cells_paremeters(cells:list):
+def print_cells_parameters(cells:list):
     str = ""
     for cell in cells:
         str += f"({cell[0]},{cell[1]}): {map_dict[cell][0]} + {map_dict[cell][1]} = {map_dict[cell][0] + map_dict[cell][1]} ({map_dict[cell][2]}) prev:{map_dict[cell][3]} |  "
@@ -175,18 +177,15 @@ def calculate_minimal_cell(cells:list, filter=None):
 def roll_back(looking_for_cell:tuple):
     global neo
     time.sleep(0.1)
-    returned_to_start = False
-    while(looking_for_cell not in get_walkable_cells_list(neo)):
-        print_cells_paremeters(get_walkable_cells_list(neo))
+    while(get_previous(neo) != None and looking_for_cell not in get_walkable_cells_list(neo)):
+        print_cells_parameters(get_walkable_cells_list(neo))
+        print("roll back")
+        print(f"target: ({looking_for_cell[0]},{looking_for_cell[1]})")
         print_map()
-        if get_previous(neo) != None:
-            returned_to_start = True
-            return returned_to_start
-        else:
-            neo = get_previous(neo)
+        neo = get_previous(neo)
         time.sleep(0.1)
         
-# TODO MAYBE MAKE A FUNCTION THAT TECALCULATES ALL "PREVIOSES" ON THE MAP USING assign_previous(cell, calculate_cell_with_minimal_g(get_walkable_cells_list(cell), "-"))
+# TODO MAYBE MAKE A FUNCTION THAT RECALCULATES ALL "PREVIOSES" ON THE MAP USING assign_previous(cell, calculate_cell_with_minimal_g(get_walkable_cells_list(cell), "-"))
 keymaker = (5,6)
 
 initialize_map_dict()
@@ -203,9 +202,10 @@ make_blocked((4,7))
 make_blocked((4,8))
 print_map()
 
-print_cells_paremeters(get_walkable_cells_list(neo))
+print_cells_parameters(get_walkable_cells_list(neo))
 time.sleep(0.1)
 finish = False
+seeking_for_target = False
 while (finish == False):
     make_closed(neo)
     for cell in get_walkable_cells_list(neo):
@@ -216,12 +216,38 @@ while (finish == False):
             if get_g(cell) > (get_g(neo) + 1):
                 set_g(cell, (get_g(neo) + 1)) # TODO MAKE A CHECK IF EXISTING g SMALLER THAN NEW ONE
     
-    next_cell = calculate_minimal_cell(list(map_dict.keys()), "+") 
-    if next_cell != get_walkable_cells_list(neo):
-        returned_to_start = roll_back(next_cell)
+    target_cell = calculate_minimal_cell(list(map_dict.keys()), "+") 
+    
+    if target_cell in get_walkable_cells_list(neo) and not seeking_for_target:
+        next_cell = target_cell
+        print("reachable and not seeking")
+        print(f"target: ({target_cell[0]},{target_cell[1]})")
+    elif target_cell not in get_walkable_cells_list(neo) and seeking_for_target:
+        next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
+        print("not reachable and seeking") 
+        print(f"target: ({target_cell[0]},{target_cell[1]})")
+    elif target_cell in get_walkable_cells_list(neo) and seeking_for_target:
+        seeking_for_target = False
+        next_cell = target_cell
+        print("reachable and seeking")
+        print(f"target: ({target_cell[0]},{target_cell[1]})")
+        
+    elif target_cell not in get_walkable_cells_list(neo) and not seeking_for_target:
+        seeking_for_target = True
+        roll_back(target_cell)
+        print("not reachable and not seeking")
+        print(f"target: ({target_cell[0]},{target_cell[1]})")
+        if target_cell in get_walkable_cells_list(neo) and seeking_for_target:
+            seeking_for_target = False
+            next_cell = target_cell
+            print("reachable and seeking (found after roll back)")
+            print(f"target: ({target_cell[0]},{target_cell[1]})")
+    
+    
+    
     assign_previous(next_cell, calculate_cell_with_minimal_g(get_walkable_cells_list(next_cell), "-"))
     previous = get_previous(next_cell)
-    print_cells_paremeters(get_walkable_cells_list(neo))
+    print_cells_parameters(get_walkable_cells_list(neo))
     print_map()
     neo = next_cell
     
