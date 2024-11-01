@@ -1,6 +1,20 @@
 import sys
 import heapq
 
+test_number = 0
+with open("20k_testset.txt", "r") as file:
+    lines = file.readlines()
+    #print(lines)
+current_line = lines[0]
+while(test_number < 10):
+    local_line_number = 0
+    for line_number in range(14):
+        local_line_number += 1
+        current_line += lines[test_number * 14 + local_line_number]
+        print(current_line)
+    test_number += 1
+    print(test_number)
+    
 min_costs = [[100]*9 for temp in range(9)]
 hs = [[0]*9 for temp in range(9)]
 astar_map = [['.']*9 for temp in range(9)]
@@ -71,6 +85,7 @@ if min_costs[goal_y][goal_x] != 100:
 else:
     print("e -1")
 
-test_number = 0
-while(test_number != 1000):
-    
+
+
+
+        

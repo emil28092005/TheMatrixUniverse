@@ -9,11 +9,9 @@ def main():
     n = int(input())
     position_input = input().split()
     
-    x = position_input[0]
-    y = position_input[1]
-    #keymaker.append(int(x))
-    #keymaker.append(int(y))
-    #print(keymaker)
+    x = (int)(position_input[0])
+    y = (int)(position_input[1])
+
     minDists[0][0] = 0
     findShortestPath(0, 0)
     if minDists[y][x] == 100:
@@ -22,9 +20,6 @@ def main():
         print("e " + str(minDists[y][x]))
 
 def exploreMap(x, y):
-    #if x == keymaker[0] and y == keymaker[1]:
-    #    print("e " + str(minDists[y][x]))
-    #    exit(0)
     print(f"m {x} {y}")
     n = int(input())
     for _ in range(n):
