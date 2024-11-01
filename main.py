@@ -211,16 +211,15 @@ keymaker = (5,6)
 initialize_map_dict()
 calculate_all_h_for_target(keymaker)
 
-'''make_blocked((1,1))
-make_blocked((1,2))
-make_blocked((1,3))
-make_blocked((1,4))
-make_blocked((4,6))
-make_blocked((5,5))
-make_blocked((6,6))
-make_blocked((4,7))
-make_blocked((4,8))'''
-#print_map()
+make_blocked((0,1))
+make_blocked((1,0))
+
+#make_blocked((4,6))
+
+#make_blocked((6,6))
+
+#make_blocked((4,8))
+print_map()
 
 #print_cells_parameters(get_walkable_cells_list(neo))
 #time.sleep(0.1)
@@ -262,7 +261,7 @@ while (finish == False):
     assign_previous(next_cell, calculate_cell_with_minimal_g(get_walkable_cells_list(next_cell), "-"))
     previous = get_previous(next_cell)
     #print_cells_parameters(get_walkable_cells_list(neo))
-    #print_map()
+    print_map()
     neo = next_cell
     steps_count += 1
     print(f"m {neo[0]} {neo[1]}")

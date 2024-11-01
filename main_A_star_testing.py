@@ -28,7 +28,7 @@ with open("20k_testset.txt", "r") as file:
     
     
 line_number = 0
-while(test_number < 1000):
+while(test_number < 100):
     #time.sleep(.5)
     start_time = time.time()
     current_test_lines = []
@@ -149,14 +149,22 @@ while(test_number < 1000):
 
 average_time = total_time / passed_tests
 
-print("-------RESULTS-------")
+print("-------A_STAR_RESULTS-------")
 print(f"passed tests: {passed_tests}")
 print(f"failed tests: {failed_tests}")
 print(f"total time: {total_time}")
 print(f"average time: {average_time}")
 '''
+FOR 100 tests
+-------A_STAR_RESULTS-------
+passed tests: 99
+failed tests: 1
+total time: 18.093406677246094
+average time: 0.1827616836085464
+
+
 FOR 1000 tests
--------RESULTS-------
+-------A_STAR_RESULTS-------
 passed tests: 995
 failed tests: 5
 total time: 184.33025455474854
