@@ -17,10 +17,9 @@ def initialize_map_dict():
         for y in range(MAP_SIZE):
             map_dict[(x,y)] = [0, 0, ".", None] #g h status previous_cell
 
-def calculate_all_h():
-    global keymaker
+def calculate_all_h_for_target(target:tuple):
     for item in map_dict.items():
-        item[1][1] = abs(keymaker[0] - item[0][0]) + abs(keymaker[1] - item[0][1]) 
+        item[1][1] = abs(target[0] - item[0][0]) + abs(target[1] - item[0][1]) 
 
 def print_map():
     global neo, keymaker
@@ -189,7 +188,7 @@ def roll_back(looking_for_cell:tuple):
 keymaker = (5,6)
 
 initialize_map_dict()
-calculate_all_h()
+calculate_all_h_for_target(keymaker)
 
 make_blocked((1,1))
 make_blocked((1,2))
@@ -213,7 +212,7 @@ while (finish == False):
             make_opened(cell)
             # TODO find and connect to minimum f|h closed in its own walkable radius
         if get_status(cell) == "+":
-            if get_g(cell) > (get_g(neo) + 1):
+            if (get_g(neo) + 1) < get_g(cell) or get_g(cell) == 0:
                 set_g(cell, (get_g(neo) + 1)) # TODO MAKE A CHECK IF EXISTING g SMALLER THAN NEW ONE
     
     target_cell = calculate_minimal_cell(list(map_dict.keys()), "+") 
@@ -222,19 +221,23 @@ while (finish == False):
         next_cell = target_cell
         print("reachable and not seeking")
         print(f"target: ({target_cell[0]},{target_cell[1]})")
+        calculate_all_h_for_target(keymaker)
     elif target_cell not in get_walkable_cells_list(neo) and seeking_for_target:
         next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
         print("not reachable and seeking") 
         print(f"target: ({target_cell[0]},{target_cell[1]})")
+        calculate_all_h_for_target(target_cell)
     elif target_cell in get_walkable_cells_list(neo) and seeking_for_target:
         seeking_for_target = False
         next_cell = target_cell
         print("reachable and seeking")
         print(f"target: ({target_cell[0]},{target_cell[1]})")
+        calculate_all_h_for_target(keymaker)
         
     elif target_cell not in get_walkable_cells_list(neo) and not seeking_for_target:
         seeking_for_target = True
         roll_back(target_cell)
+        calculate_all_h_for_target(target_cell)
         print("not reachable and not seeking")
         print(f"target: ({target_cell[0]},{target_cell[1]})")
         if target_cell in get_walkable_cells_list(neo) and seeking_for_target:
@@ -242,7 +245,12 @@ while (finish == False):
             next_cell = target_cell
             print("reachable and seeking (found after roll back)")
             print(f"target: ({target_cell[0]},{target_cell[1]})")
-    
+            calculate_all_h_for_target(keymaker)
+        elif target_cell not in get_walkable_cells_list(neo) and seeking_for_target:
+            next_cell = calculate_minimal_cell(get_walkable_cells_list(neo))
+            print("not reachable and seeking (not found after roll back)") 
+            print(f"target: ({target_cell[0]},{target_cell[1]})")
+            calculate_all_h_for_target(target_cell)
     
     
     assign_previous(next_cell, calculate_cell_with_minimal_g(get_walkable_cells_list(next_cell), "-"))
